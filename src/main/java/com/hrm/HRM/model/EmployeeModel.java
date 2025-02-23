@@ -1,5 +1,6 @@
 package com.hrm.HRM.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.hrm.HRM.enums.EmployeeStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -40,6 +41,7 @@ public class EmployeeModel {
     @JoinColumn(name = "job_id", nullable = false)
     private JobPositionModel jobPosition;
 
+    @JsonFormat(pattern = "dd/MM/yyyy")
     private Date hireDate;
 
     private Double salary;

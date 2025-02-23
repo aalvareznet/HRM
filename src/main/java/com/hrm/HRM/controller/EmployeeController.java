@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 @RestController
@@ -43,6 +44,7 @@ public class EmployeeController {
             employeeToUpdate.setDepartment(employeeModel.getDepartment());
             employeeToUpdate.setJobPosition(employeeModel.getJobPosition());
             employeeToUpdate.setStatus(employeeModel.getStatus());
+            employeeToUpdate.setPhoneNumber(employeeModel.getPhoneNumber());
             EmployeeModel updatedEmployee = service.update(employeeToUpdate);
             return ResponseEntity.ok(updatedEmployee);
         }else{
@@ -58,7 +60,8 @@ public class EmployeeController {
         return ResponseEntity.noContent().build();
     }
     @GetMapping("/{status}")
-    public ResponseEntity<List<EmployeeModel>> getAllEmployeesByStatus(@PathVariable EmployeeStatus employeeStatus){
+    public ResponseEntity<List<EmployeeModel>> getAllEmployeesByStatus(@PathVariable String status){
+        EmployeeStatus employeeStatus = EmployeeStatus.valueOf(status.toUpperCase());
         List<EmployeeModel> employees = service.getByStatus(employeeStatus);
         if (employees.isEmpty()){
             return ResponseEntity.notFound().build();
@@ -66,7 +69,7 @@ public class EmployeeController {
             return ResponseEntity.ok(employees);
         }
     }
-    @PutMapping("/activate/{id}")
+    @PutMapping("/{id}/activate")
     public ResponseEntity<EmployeeModel> activateEmployee(@PathVariable Long id){
         Optional<EmployeeModel> employeeOption = service.findById(id);
         if (employeeOption.isPresent()){
@@ -80,7 +83,7 @@ public class EmployeeController {
         }
         return ResponseEntity.notFound().build();
     }
-    @PutMapping("/deactivate/{id}")
+    @PutMapping("/{id}/deactivate")
     public ResponseEntity<EmployeeModel> deactivateEmployee(@PathVariable Long id){
         Optional<EmployeeModel> employeeOption = service.findById(id);
         if (employeeOption.isPresent()){

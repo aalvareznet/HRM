@@ -9,5 +9,5 @@ import java.util.List;
 
 @Repository
 public interface EmployeeRepo extends JpaRepository<EmployeeModel, Long> {
-    List<EmployeeModel> findByStatus(EmployeeStatus employeeStatus);
+    List<EmployeeModel> findByStatus(EmployeeStatus status);
 }
