@@ -14,6 +14,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/v1/employees")
 public class EmployeeController {
+
     @Autowired
     private EmployeeService service;
 
@@ -65,7 +66,7 @@ public class EmployeeController {
             return ResponseEntity.ok(employees);
         }
     }
-    @PutMapping("/{id}")
+    @PutMapping("/activate/{id}")
     public ResponseEntity<EmployeeModel> activateEmployee(@PathVariable Long id){
         Optional<EmployeeModel> employeeOption = service.findById(id);
         if (employeeOption.isPresent()){
@@ -75,10 +76,11 @@ public class EmployeeController {
                 EmployeeModel updatedEmployee = service.update(employeeToUpdate);
                 return ResponseEntity.ok().body(updatedEmployee);
             }
+            return ResponseEntity.ok(employeeToUpdate);
         }
         return ResponseEntity.notFound().build();
     }
-    @PutMapping("/{id}")
+    @PutMapping("/deactivate/{id}")
     public ResponseEntity<EmployeeModel> deactivateEmployee(@PathVariable Long id){
         Optional<EmployeeModel> employeeOption = service.findById(id);
         if (employeeOption.isPresent()){
@@ -88,6 +90,7 @@ public class EmployeeController {
                 EmployeeModel updatedEmployee = service.update(employeeToUpdate);
                 return ResponseEntity.ok().body(updatedEmployee);
             }
+            return ResponseEntity.ok(employeeToUpdate);
         }
         return ResponseEntity.notFound().build();
     }

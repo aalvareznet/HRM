@@ -4,10 +4,12 @@ import com.hrm.HRM.enums.EmployeeStatus;
 import com.hrm.HRM.model.EmployeeModel;
 import com.hrm.HRM.repository.EmployeeRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
+
+@Service
 public class EmployeeService extends BaseService<EmployeeModel, Long>{
     @Autowired
     private EmployeeRepo employeeRepo;
@@ -21,7 +23,4 @@ public class EmployeeService extends BaseService<EmployeeModel, Long>{
         return employeeRepo.findByStatus(employeeStatus);
     }
 
-    public void activateEmployee(Long id) {
-
-    }
 }
