@@ -1,6 +1,8 @@
 package com.hrm.HRM.controller;
 
 
+import com.hrm.HRM.Mapper.EmployeeMapper;
+import com.hrm.HRM.dto.EmployeeDto;
 import com.hrm.HRM.enums.EmployeeStatus;
 import com.hrm.HRM.model.EmployeeModel;
 import com.hrm.HRM.service.EmployeeService;
@@ -9,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 
 @RestController
@@ -18,19 +19,25 @@ public class EmployeeController {
 
     @Autowired
     private EmployeeService service;
+    @Autowired
+    private EmployeeMapper mapper;
 
     @GetMapping("/")
-    public ResponseEntity<List<EmployeeModel>> getEmployees(){
+    public ResponseEntity<List<EmployeeDto>> getEmployees(){
         List<EmployeeModel> employeeList = service.findAll();
-        return ResponseEntity.ok(employeeList);
+        List<EmployeeDto> returnList = employeeList.stream()
+                .map(mapper::convertToDto)
+                .toList();
+        return ResponseEntity.ok(returnList);
     }
     @PostMapping("/")
-    public ResponseEntity<EmployeeModel> createEmployee(@RequestBody EmployeeModel employeeModel){
+    public ResponseEntity<EmployeeDto> createEmployee(@RequestBody EmployeeModel employeeModel){
         EmployeeModel employee = service.create(employeeModel);
-        return ResponseEntity.ok(employee);
+        EmployeeDto returnEmployee = mapper.convertToDto(employeeModel);
+        return ResponseEntity.ok(returnEmployee);
     }
     @PutMapping("/{id}")
-    public ResponseEntity<EmployeeModel> updateEmployee(@PathVariable Long id,
+    public ResponseEntity<EmployeeDto> updateEmployee(@PathVariable Long id,
                                                         @RequestBody EmployeeModel employeeModel){
         Optional<EmployeeModel> employeeOptional = service.findById(id);
         if(employeeOptional.isPresent()){
@@ -46,7 +53,8 @@ public class EmployeeController {
             employeeToUpdate.setStatus(employeeModel.getStatus());
             employeeToUpdate.setPhoneNumber(employeeModel.getPhoneNumber());
             EmployeeModel updatedEmployee = service.update(employeeToUpdate);
-            return ResponseEntity.ok(updatedEmployee);
+            EmployeeDto returnEmployee = mapper.convertToDto(updatedEmployee);
+            return ResponseEntity.ok(returnEmployee);
         }else{
             return ResponseEntity.notFound().build();
         }
@@ -60,40 +68,45 @@ public class EmployeeController {
         return ResponseEntity.noContent().build();
     }
     @GetMapping("/{status}")
-    public ResponseEntity<List<EmployeeModel>> getAllEmployeesByStatus(@PathVariable String status){
+    public ResponseEntity<List<EmployeeDto>> getAllEmployeesByStatus(@PathVariable String status){
         EmployeeStatus employeeStatus = EmployeeStatus.valueOf(status.toUpperCase());
         List<EmployeeModel> employees = service.getByStatus(employeeStatus);
         if (employees.isEmpty()){
             return ResponseEntity.notFound().build();
         } else{
-            return ResponseEntity.ok(employees);
+            List<EmployeeDto> returnList = employees.stream()
+                                                    .map(mapper::convertToDto)
+                                                    .toList();
+            return ResponseEntity.ok(returnList);
         }
     }
     @PutMapping("/{id}/activate")
-    public ResponseEntity<EmployeeModel> activateEmployee(@PathVariable Long id){
+    public ResponseEntity<EmployeeDto> activateEmployee(@PathVariable Long id){
         Optional<EmployeeModel> employeeOption = service.findById(id);
         if (employeeOption.isPresent()){
             EmployeeModel employeeToUpdate = employeeOption.get();
             if (employeeToUpdate.getStatus() != EmployeeStatus.ACTIVE){
                 employeeToUpdate.setStatus(EmployeeStatus.ACTIVE);
                 EmployeeModel updatedEmployee = service.update(employeeToUpdate);
-                return ResponseEntity.ok().body(updatedEmployee);
+                EmployeeDto returnEmployee = mapper.convertToDto(updatedEmployee);
+                return ResponseEntity.ok().body(returnEmployee);
             }
-            return ResponseEntity.ok(employeeToUpdate);
+            return ResponseEntity.ok(mapper.convertToDto(employeeToUpdate));
         }
         return ResponseEntity.notFound().build();
     }
     @PutMapping("/{id}/deactivate")
-    public ResponseEntity<EmployeeModel> deactivateEmployee(@PathVariable Long id){
+    public ResponseEntity<EmployeeDto> deactivateEmployee(@PathVariable Long id){
         Optional<EmployeeModel> employeeOption = service.findById(id);
         if (employeeOption.isPresent()){
             EmployeeModel employeeToUpdate = employeeOption.get();
             if (employeeToUpdate.getStatus() == EmployeeStatus.ACTIVE){
                 employeeToUpdate.setStatus(EmployeeStatus.INACTIVE);
                 EmployeeModel updatedEmployee = service.update(employeeToUpdate);
-                return ResponseEntity.ok().body(updatedEmployee);
+                EmployeeDto returnEmployee = mapper.convertToDto(updatedEmployee);
+                return ResponseEntity.ok().body(returnEmployee);
             }
-            return ResponseEntity.ok(employeeToUpdate);
+            return ResponseEntity.ok(mapper.convertToDto(employeeToUpdate));
         }
         return ResponseEntity.notFound().build();
     }
